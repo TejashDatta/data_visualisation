@@ -2,16 +2,16 @@ import plotly, json
 import plotly.graph_objs as go
 import pandas as pd
 
-FILENAME = 'data_sets/statewise_elementary.csv'
-STATE_NAME_FIELD = 'STATNAME'
-COLORING_FIELD = 'OVERALL_LI'
+FILENAME = 'data_sets/education_statewise_elementary.csv'
+STATE_NAME_FIELD = 'State_Name'
+COLORING_FIELD = 'Overall_Literacy'
 COLOR_MIN = (123, 173, 252)
 COLOR_MAX = (0, 33, 86)
 
 
 df = pd.read_csv(FILENAME)
 
-with open('./resources/states.geojson') as f:
+with open('./resources/state_boundaries.geojson') as f:
     state_data = json.load(f)
 
 MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoidW5jaGFydGVkbWFwcGVyIiwiYSI6ImNqc2plamlmbjFmYnUzeXFndjcwdTk3ZWYifQ.PV4-cwpuY1PQ2u0HfI8GPg'
@@ -35,6 +35,17 @@ for state in state_data['features']:
     state_json_template['features'] = [state]
     state_name = state['properties']['NAME_1']
     state_jsons[state_name]=state_json_template
+    if state_name == 'Jammu and Kashmir Full':
+        state_layer = dict(
+                    sourcetype = 'geojson',
+                    source = state_json_template,
+                    type = 'line',
+                    opacity = 0.5,
+                    color = 'rgb(128,128,128)',
+                    line = {'width': 1},
+                )
+        state_layers.append(state_layer)
+        break
     found = 0
     for state_index, csv_state in enumerate(df[STATE_NAME_FIELD]):
         if state_name.lower() == csv_state.replace('&', 'and').lower():
